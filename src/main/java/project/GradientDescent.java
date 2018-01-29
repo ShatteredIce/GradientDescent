@@ -25,17 +25,20 @@ import org.jzy3d.plot3d.rendering.canvas.Quality;
 
 public class GradientDescent extends AbstractAnalysis implements KeyListener{
     
-	//constants for program
+	//parameters for program
     float minBound = -3;
     float maxBound = 3;  
+    double learningRate = 1;
     double delta = 0.01; //precision for calculating derivatives
     int stepDelay = 25;  //delay between each step in milliseconds 
     int direction = 1;   //1 for finding minimum, -1 for finding maximum
+    int iterations = 1000;
     float sphereSize = 0.1f;
     
     Random rng = new Random();
     boolean launched = false;
     boolean running = false;
+    int currentIteration = 0;
     
     Component canvas;
     
@@ -56,8 +59,8 @@ public class GradientDescent extends AbstractAnalysis implements KeyListener{
         final Mapper mapper = new Mapper() {
             @Override
             public double f(double x, double y) {
-//                return x * Math.sin(x * y);
-            	return Math.pow((Math.pow(x, 2) + Math.pow(y, 2)),0.5);
+                return x * Math.sin(x * y);
+//            	return Math.pow((Math.pow(x, 2) + Math.pow(y, 2)),0.5);
             }
         };
       
@@ -90,7 +93,7 @@ public class GradientDescent extends AbstractAnalysis implements KeyListener{
         Thread t = new Thread(){
 			@Override
 			public void run() {
-				while(true){
+				while(currentIteration != iterations){
 					try {
 						sleep(stepDelay);
 					} catch (InterruptedException e) {
@@ -105,15 +108,21 @@ public class GradientDescent extends AbstractAnalysis implements KeyListener{
 						double y = temp.getY();
 						double dx = mapper.f(x + delta, y) - mapper.f(x, y);
 						double dy = mapper.f(x, y + delta) - mapper.f(x, y);
-						double newx = x - dx * direction;
-						double newy = y - dy * direction;
+						double newx = x - learningRate * (dx * direction);
+						double newy = y - learningRate * (dy * direction);
 						newx = Math.max(newx, minBound);
 						newx = Math.min(newx, maxBound);
 						newy = Math.max(newy, minBound);
 						newy = Math.min(newy, maxBound);
 						currentPos.setPosition(new Coord3d(newx, newy, mapper.f(newx, newy)));
+						currentIteration++;
 					}
 				}
+				Coord2d temp = currentPos.getPosition().getXY();
+				System.out.println("Final Position");
+				System.out.println("X: " + temp.getX());
+				System.out.println("Y: " + temp.getY());
+				System.out.println("Z: " + mapper.f(temp.getX(), temp.getY()));
 			}
 		};
 		t.start();
