@@ -1,3 +1,5 @@
+//Gradient Descent using Jzy3d graphing library - Created on 1/25/18 by Nathan Purwosumarto 
+
 package project;
 
 import java.awt.Component;
@@ -140,6 +142,7 @@ public class GradientDescent extends AbstractAnalysis implements KeyListener{
 		if(e.getKeyCode() == KeyEvent.VK_ENTER){
             running = !running;
          }
+		//print out current coordinate
 		else if(e.getKeyCode() == KeyEvent.VK_P) {
 			Coord2d temp = currentPos.getPosition().getXY();
 			double finalX = Math.round(temp.getX()*1000)/1000d;
@@ -150,8 +153,17 @@ public class GradientDescent extends AbstractAnalysis implements KeyListener{
 			System.out.println("Z: " + Math.round(mapper.f(finalX, finalY)*1000)/1000d);
 			System.out.println("------------------------------------");
 		}
+		//skip to max iterations
 		else if(e.getKeyCode() == KeyEvent.VK_I) {
 			stepDelay = 0;
+		}
+		//set point to new random location
+		else if(e.getKeyCode() == KeyEvent.VK_R) {
+			double randomx = minBound + rng.nextDouble() * (maxBound - minBound);
+	        double randomy = minBound + rng.nextDouble() * (maxBound - minBound);
+	        currentPos.setPosition(new Coord3d(randomx, randomy, mapper.f(randomx, randomy)));
+	        currentIteration = 0;
+	        running = false;
 		}
 		
 	}
